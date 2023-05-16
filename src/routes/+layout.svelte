@@ -58,41 +58,13 @@
 								<a href="/wins" class={$page.url.pathname === '/wins' ? activeTab : inactiveTab}>
 									Wins
 								</a>
-								<!-- <div class="justify-self-end">
-									{#if $currentUser}
-										<form method="POST" action="/logout" use:enhance={enhanceLogout}>
-											<button
-												class="text-white hover:bg-indigo-500 hover:bg-opacity-75 rounded-md py-2 px-3 text-sm font-medium"
-											>
-												Logout
-											</button>
-										</form>
-									{:else}
-										<a
-											href="/login"
-											class={$page.url.pathname === '/login' ? activeTab : inactiveTab}
-										>
-											Login
-										</a>
-										<a
-											href="/register"
-											class={$page.url.pathname === '/register' ? activeTab : inactiveTab}
-										>
-											Register
-										</a>
-									{/if}
-								</div> -->
 							</div>
 						</div>
 					</div>
 					<div class="hidden lg:flex lg:flex-1 lg:px-2 lg:ml-6 lg:justify-end">
 						{#if $currentUser}
 							<form method="POST" action="/logout" use:enhance={enhanceLogout}>
-								<button
-									class="text-white hover:bg-indigo-500 hover:bg-opacity-75 rounded-md py-2 px-3 text-sm font-medium"
-								>
-									Logout
-								</button>
+								<button class={inactiveTab}> Logout </button>
 							</form>
 						{:else}
 							<a href="/login" class={$page.url.pathname === '/login' ? activeTab : inactiveTab}>
@@ -120,10 +92,13 @@
 						class={$page.url.pathname === '/wins' ? activeMobileTab : inactiveMobileTab}>Wins</a
 					>
 					{#if $currentUser}
-						<form method="POST" action="/logout" use:enhance={enhanceLogout}>
-							<button class={$page.url.pathname === '/logout' ? activeMobileTab : inactiveMobileTab}
-								>Logout</button
-							>
+						<form
+							class={inactiveMobileTab}
+							method="POST"
+							action="/logout"
+							use:enhance={enhanceLogout}
+						>
+							<button class="w-full text-start">Logout</button>
 						</form>
 					{:else}
 						<a

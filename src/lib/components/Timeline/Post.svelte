@@ -5,8 +5,6 @@
 	export let date: string;
 	export let winsOfTheDay: string[];
 	export let lastPost: boolean;
-
-	console.log($currentUser?.id);
 </script>
 
 <!-- Make this a component with props -->
