@@ -67,7 +67,7 @@
 					<div class="overflow-hidden lg:w-1/2 w-9/12 rounded-md border border-gray-300">
 						<ul class="divide-y divide-gray-300">
 							{#each winsOfTheDay as win}
-								<li class="px-6 py-4">
+								<li class="px-6 py-4 whitespace-pre-wrap">
 									{win}
 								</li>
 							{/each}
