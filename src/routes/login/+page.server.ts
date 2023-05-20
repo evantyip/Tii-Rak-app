@@ -1,4 +1,14 @@
 import { redirect, type Actions } from '@sveltejs/kit';
+import type { PageData, PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({ locals }) => {
+	if (locals.user) {
+		throw redirect(303, '/');
+	}
+
+	const emptyPageData: PageData = {};
+	return emptyPageData;
+};
 
 export const actions: Actions = {
 	default: async ({ locals, request, url }) => {

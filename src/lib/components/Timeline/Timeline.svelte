@@ -13,6 +13,7 @@
 		{#each data.wins.items as day, index}
 			<Post
 				authorId={day.user}
+				authorName={day.expand.user.first_name}
 				date={day.created}
 				winsOfTheDay={day.wins.data}
 				lastPost={index === lastIndex}

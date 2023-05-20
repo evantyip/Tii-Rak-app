@@ -63,6 +63,14 @@
 					</div>
 					<div class="hidden lg:flex lg:flex-1 lg:px-2 lg:ml-6 lg:justify-end">
 						{#if $currentUser}
+							{#if $currentUser.partner === ''}
+								<a
+									href="/requests"
+									class={$page.url.pathname === '/requests' ? activeTab : inactiveTab}
+								>
+									Requests
+								</a>
+							{/if}
 							<form method="POST" action="/logout" use:enhance={enhanceLogout}>
 								<button class={inactiveTab}> Logout </button>
 							</form>
@@ -92,6 +100,14 @@
 						class={$page.url.pathname === '/wins' ? activeMobileTab : inactiveMobileTab}>Wins</a
 					>
 					{#if $currentUser}
+						{#if $currentUser.partner === ''}
+							<a
+								href="/requests"
+								class={$page.url.pathname === '/requests' ? activeMobileTab : inactiveMobileTab}
+							>
+								Requests
+							</a>
+						{/if}
 						<form
 							class={inactiveMobileTab}
 							method="POST"

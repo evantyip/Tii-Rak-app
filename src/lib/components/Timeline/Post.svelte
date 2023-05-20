@@ -2,6 +2,7 @@
 	import { currentUser } from '$lib/pocketbase';
 
 	export let authorId: string;
+	export let authorName: string;
 	export let date: string;
 	export let winsOfTheDay: string[];
 	export let lastPost: boolean;
@@ -56,7 +57,7 @@
 					<div class="text-sm">
 						<!-- This is name -->
 						<p class="font-medium text-gray-900">
-							{authorId === $currentUser?.id ? 'You' : 'Other'}
+							{authorId === $currentUser?.id ? 'You' : authorName}
 						</p>
 					</div>
 					<!-- Date/time -->
@@ -67,7 +68,7 @@
 					<div class="overflow-hidden lg:w-1/2 w-9/12 rounded-md border border-gray-300">
 						<ul class="divide-y divide-gray-300">
 							{#each winsOfTheDay as win}
-								<li class="px-6 py-4">
+								<li class="px-6 py-4 whitespace-pre-wrap">
 									{win}
 								</li>
 							{/each}
