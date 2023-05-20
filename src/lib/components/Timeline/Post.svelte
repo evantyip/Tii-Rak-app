@@ -2,6 +2,7 @@
 	import { currentUser } from '$lib/pocketbase';
 
 	export let authorId: string;
+	export let authorName: string;
 	export let date: string;
 	export let winsOfTheDay: string[];
 	export let lastPost: boolean;
@@ -56,7 +57,7 @@
 					<div class="text-sm">
 						<!-- This is name -->
 						<p class="font-medium text-gray-900">
-							{authorId === $currentUser?.id ? 'You' : 'Other'}
+							{authorId === $currentUser?.id ? 'You' : authorName}
 						</p>
 					</div>
 					<!-- Date/time -->
