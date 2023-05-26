@@ -31,14 +31,16 @@ export const actions: Actions = {
 			username: string;
 		};
 
-		if (!data.username) {
+		const username = data.username.trim();
+
+		if (!username) {
 			return { error: true, errorMessages: ['Search field cannot be empty'] };
 		}
 
 		try {
 			const requestedPartner = await locals.pb
 				.collection('users')
-				.getFirstListItem(`username="${data.username}"`);
+				.getFirstListItem(`username="${username}"`);
 
 			if (requestedPartner.partner !== '') {
 				return { error: true, errorMessages: ['Cannot send partner request to user'] };
