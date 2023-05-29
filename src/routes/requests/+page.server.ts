@@ -8,6 +8,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		throw redirect(303, `/login?redirectTo=${fromUrl}`);
 	}
 
+	if (locals.user && !locals.user.first_name) {
+		throw redirect(303, '/register/setup');
+	}
+
 	if (locals.user.partner !== '') {
 		throw redirect(303, '/');
 	}

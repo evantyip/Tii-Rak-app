@@ -7,6 +7,10 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		throw redirect(302, `/login?redirectTo=${fromUrl}`);
 	}
 
+	if (locals.user && !locals.user.first_name) {
+		throw redirect(303, '/register/setup');
+	}
+
 	const pageData: PageData = {};
 
 	return pageData;
