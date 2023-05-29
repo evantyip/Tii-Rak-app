@@ -21,6 +21,8 @@
 				return 'Sign Up';
 			case '/wins':
 				return 'Slays for the day';
+			case '/profile':
+				return 'Profile';
 			default:
 				return '';
 		}
