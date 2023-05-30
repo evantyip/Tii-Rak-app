@@ -14,6 +14,8 @@
 			<Post
 				authorId={day.user}
 				authorName={day.expand.user.first_name}
+				authorAvatar={day.expand.user.avatar}
+				authorCollectionId={day.expand.user.collectionId}
 				date={day.created}
 				winsOfTheDay={day.wins.data}
 				lastPost={index === lastIndex}
