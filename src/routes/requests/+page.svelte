@@ -2,6 +2,8 @@
 	import { pb } from '$lib/pocketbase';
 	import { writable } from 'svelte/store';
 	import type { ActionData } from './$types';
+	import { enhance } from '$app/forms';
+	import { getImageURL } from '$lib/utils';
 
 	interface PartnerRequest {
 		id: string;
@@ -71,24 +73,31 @@
 			{#each $requests as request, index}
 				<li class="flex justify-between gap-x-6 py-5">
 					<div class="flex gap-x-4">
-						<!-- TODO: incorporate usernames -->
-						<!-- <img
-										class="h-12 w-12 flex-none rounded-full bg-gray-50"
-										src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-										alt=""
-									/> -->
-						<svg
-							class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 ring-8 ring-white"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-							aria-hidden="true"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z"
-								clip-rule="evenodd"
+						{#if request.expand.from_user.avatar}
+							<img
+								class="h-12 w-12 inline-block object-cover flex-none rounded-full bg-gray-50"
+								src={getImageURL(
+									request.expand.from_user.collectionId,
+									request.expand.from_user.id,
+									request.expand.from_user.avatar,
+									'500x500'
+								)}
+								alt="Requested user avatar"
 							/>
-						</svg>
+						{:else}
+							<svg
+								class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 ring-8 ring-white"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+								aria-hidden="true"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+						{/if}
 						<div class="min-w-0 flex-auto">
 							<p class="text-sm font-semibold leading-6 text-gray-900">
 								{request.expand.from_user?.first_name}
@@ -184,7 +193,7 @@
 			</div>
 		{/if}
 
-		<form method="POST" action="?/partnerRequest">
+		<form method="POST" action="?/partnerRequest" use:enhance>
 			<div class="flex flex-row mt-4">
 				<input
 					name="username"

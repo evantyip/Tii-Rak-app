@@ -2,9 +2,14 @@ import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageData, PageServerLoad } from './$types';
 import { ClientResponseError } from 'pocketbase';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	if (locals.user) {
+export const load: PageServerLoad = async ({ locals, url }) => {
+	if (locals.user && locals.user.first_name) {
 		throw redirect(303, '/');
+	}
+
+	if (!locals.user) {
+		const fromUrl = url.pathname + url.search;
+		throw redirect(303, `/login?redirectTo=${fromUrl}`);
 	}
 
 	const emptyPageData: PageData = {};
@@ -14,25 +19,14 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	default: async ({ locals, request }) => {
 		const data = Object.fromEntries(await request.formData()) as {
-			email: string;
 			username: string;
 			first_name: string;
-			password: string;
-			passwordConfirm: string;
 		};
 
 		try {
-			await locals.pb.collection('users').create(data);
-			await locals.pb.collection('users').authWithPassword(data.email, data.password);
-		} catch (err: unknown) {
+			await locals.pb.collection('users').update(locals.user?.id as string, data);
+		} catch (err) {
 			console.log(err);
-
-			if (err instanceof ClientResponseError && err.data.data.email) {
-				return fail(422, {
-					error: true,
-					errorMessages: [err.data.data.email.message]
-				});
-			}
 
 			if (err instanceof ClientResponseError && err.data.data.username) {
 				return fail(422, {
@@ -41,13 +35,10 @@ export const actions: Actions = {
 				});
 			}
 
-			if (
-				err instanceof ClientResponseError &&
-				(err.data.data.password || err.data.data.passwordConfirm)
-			) {
+			if (err instanceof ClientResponseError && err.data.data.first_name) {
 				return fail(422, {
 					error: true,
-					errorMessages: ['Password values do not match']
+					errorMessages: [err.data.data.first_name.message]
 				});
 			}
 

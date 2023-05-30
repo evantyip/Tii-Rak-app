@@ -1,12 +1,21 @@
 <script lang="ts">
 	import { applyAction, enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
-	import { pb } from '$lib/pocketbase';
+	import { currentUser, pb } from '$lib/pocketbase';
+	import { Error } from '$lib/components';
+	import type { ActionData } from './$types';
+
+	export let form: ActionData;
+	let loading: boolean = false;
 
 	function loginEnhance() {
 		return async ({ result }: { result: any }) => {
+			loading = true;
+
 			pb.authStore.loadFromCookie(document.cookie);
 			await applyAction(result);
+
+			loading = false;
 		};
 	}
 
@@ -34,6 +43,15 @@
 
 	<div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
 		<div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
+			{#if form?.error && form?.errorMessages.length === 1}
+				<div class="pb-6">
+					<Error mainMessage={form?.errorMessages[0]} />
+				</div>
+			{:else if form?.error && form?.errorMessages.length > 1}
+				<div class="pb-6">
+					<Error mainMessage="Invalid Registration" messages={form?.errorMessages} />
+				</div>
+			{/if}
 			<form class="space-y-6" method="POST" use:enhance={loginEnhance}>
 				<div>
 					<label for="email" class="block text-sm font-medium leading-6 text-gray-900"
@@ -47,6 +65,7 @@
 							autocomplete="email"
 							required
 							class="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							disabled={loading}
 						/>
 					</div>
 				</div>
@@ -63,6 +82,7 @@
 							autocomplete="current-password"
 							required
 							class="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							disabled={loading}
 						/>
 					</div>
 				</div>
@@ -74,6 +94,7 @@
 							name="remember-me"
 							type="checkbox"
 							class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+							disabled={loading}
 						/>
 						<label for="remember-me" class="ml-3 block text-sm leading-6 text-gray-900"
 							>Remember me</label
@@ -91,8 +112,10 @@
 					<button
 						type="submit"
 						class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-						>Sign in</button
+						disabled={loading}
 					>
+						Sign in
+					</button>
 				</div>
 			</form>
 
@@ -205,6 +228,13 @@
 					</button>
 				</div>
 			</div>
+
+			<p class="mt-10 text-center text-sm text-gray-500">
+				Don't an account?
+				<a href="/register" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+					>Register</a
+				>
+			</p>
 		</div>
 	</div>
 </div>
