@@ -1,5 +1,6 @@
-import { redirect, type Actions } from '@sveltejs/kit';
+import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageData, PageServerLoad } from './$types';
+import { ClientResponseError } from 'pocketbase';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
@@ -15,6 +16,7 @@ export const actions: Actions = {
 		const data = Object.fromEntries(await request.formData()) as {
 			email: string;
 			username: string;
+			first_name: string;
 			password: string;
 			passwordConfirm: string;
 		};
@@ -22,9 +24,37 @@ export const actions: Actions = {
 		try {
 			await locals.pb.collection('users').create(data);
 			await locals.pb.collection('users').authWithPassword(data.email, data.password);
-		} catch (err) {
-			console.error(err);
-			throw err;
+		} catch (err: unknown) {
+			console.log(err);
+
+			if (err instanceof ClientResponseError && err.data.data.email) {
+				return fail(422, {
+					error: true,
+					errorMessages: [err.data.data.email.message]
+				});
+			}
+
+			if (err instanceof ClientResponseError && err.data.data.username) {
+				return fail(422, {
+					error: true,
+					errorMessages: [err.data.data.username.message]
+				});
+			}
+
+			if (
+				err instanceof ClientResponseError &&
+				(err.data.data.password || err.data.data.passwordConfirm)
+			) {
+				return fail(422, {
+					error: true,
+					errorMessages: ['Password values do not match']
+				});
+			}
+
+			return fail(500, {
+				error: true,
+				errorMessages: ['Something went wrong']
+			});
 		}
 
 		throw redirect(303, '/');

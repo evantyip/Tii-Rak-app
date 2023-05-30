@@ -1,12 +1,21 @@
 <script lang="ts">
 	import { applyAction, enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { Error } from '$lib/components';
 	import { pb } from '$lib/pocketbase';
+	import type { ActionData } from './$types';
+
+	export let form: ActionData;
+	let loading: boolean = false;
 
 	function registerEnhance() {
 		return async ({ result }: { result: any }) => {
+			loading = true;
+
 			pb.authStore.loadFromCookie(document.cookie);
 			await applyAction(result);
+
+			loading = false;
 		};
 	}
 
@@ -34,6 +43,15 @@
 
 	<div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
 		<div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
+			{#if form?.error && form?.errorMessages.length === 1}
+				<div class="pb-6">
+					<Error mainMessage={form?.errorMessages[0]} />
+				</div>
+			{:else if form?.error && form?.errorMessages.length > 1}
+				<div class="pb-6">
+					<Error mainMessage="Invalid Registration" messages={form?.errorMessages} />
+				</div>
+			{/if}
 			<form class="space-y-6" method="POST" use:enhance={registerEnhance}>
 				<div>
 					<label for="email" class="block text-sm font-medium leading-6 text-gray-900"
@@ -46,6 +64,7 @@
 							type="email"
 							required
 							class="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							disabled={loading}
 						/>
 					</div>
 				</div>
@@ -61,6 +80,23 @@
 							type="username"
 							required
 							class="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							disabled={loading}
+						/>
+					</div>
+				</div>
+
+				<div>
+					<label for="first_name" class="block text-sm font-medium leading-6 text-gray-900"
+						>First Name</label
+					>
+					<div class="mt-2">
+						<input
+							id="first_name"
+							name="first_name"
+							type="first_name"
+							required
+							class="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							disabled={loading}
 						/>
 					</div>
 				</div>
@@ -76,6 +112,7 @@
 							type="password"
 							required
 							class="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							disabled={loading}
 						/>
 					</div>
 				</div>
@@ -91,6 +128,7 @@
 							type="password"
 							required
 							class="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							disabled={loading}
 						/>
 					</div>
 				</div>
@@ -98,8 +136,10 @@
 					<button
 						type="submit"
 						class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-						>Register</button
+						disabled={loading}
 					>
+						Register
+					</button>
 				</div>
 			</form>
 
@@ -214,9 +254,9 @@
 
 				<p class="mt-10 text-center text-sm text-gray-500">
 					Already signed up?
-					<a href="/login" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-						>Login</a
-					>
+					<a href="/login" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+						Login
+					</a>
 				</p>
 			</div>
 		</div>

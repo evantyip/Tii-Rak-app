@@ -20,10 +20,6 @@
 		switch (path) {
 			case '/':
 				return 'Home';
-			case '/login':
-				return 'Sign In';
-			case '/register':
-				return 'Sign Up';
 			case '/wins':
 				return 'Slays for the day';
 			case '/profile':
@@ -166,12 +162,6 @@
 							<a href="/login" class={$page.url.pathname === '/login' ? activeTab : inactiveTab}>
 								Login
 							</a>
-							<a
-								href="/register"
-								class={$page.url.pathname === '/register' ? activeTab : inactiveTab}
-							>
-								Register
-							</a>
 						{/if}
 					</div>
 				</div>
@@ -186,12 +176,6 @@
 							class={$page.url.pathname === '/login' ? activeMobileTab : inactiveMobileTab}
 						>
 							Login
-						</a>
-						<a
-							href="/register"
-							class={$page.url.pathname === '/register' ? activeMobileTab : inactiveMobileTab}
-						>
-							Register
 						</a>
 					</div>
 				{/if}

@@ -1,4 +1,4 @@
-import { redirect, type Actions } from '@sveltejs/kit';
+import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageData, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -21,7 +21,11 @@ export const actions: Actions = {
 			await locals.pb.collection('users').authWithPassword(data.email, data.password);
 		} catch (err) {
 			console.error(err);
-			throw err;
+
+			return fail(422, {
+				error: true,
+				errorMessages: ['Invalid login credentials']
+			});
 		}
 
 		const redirectTo = url.searchParams.get('redirectTo');
