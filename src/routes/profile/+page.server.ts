@@ -1,7 +1,6 @@
 import { redirect, type Actions, fail } from '@sveltejs/kit';
 import type { PageData, PageServerLoad } from './$types';
 import { ClientResponseError } from 'pocketbase';
-import { getImageURL } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user) {
@@ -13,21 +12,25 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		throw redirect(303, '/register/setup');
 	}
 
+	const avatarLink = locals.pb.files.getUrl(
+		locals.pb.authStore.model as Pick<
+			Record<string, string>,
+			'id' | 'collectionId' | 'collectionName'
+		>,
+		locals.pb.authStore.model?.avatar,
+		{ thumb: '500x500' }
+	);
+
 	if (locals.user.partner) {
 		const partnerRecord = await locals.pb.collection('users').getOne(locals.user.partner);
 		return {
 			partnerRecord: structuredClone(partnerRecord),
-			avatarLink: getImageURL(
-				locals.user.collectionId,
-				locals.user.id,
-				locals.user.avatar,
-				'500x500'
-			)
+			avatarLink
 		};
 	}
 
 	const pageData: PageData = {
-		avatarLink: getImageURL(locals.user.collectionId, locals.user.id, locals.user.avatar, '500x500')
+		avatarLink
 	};
 
 	return pageData;

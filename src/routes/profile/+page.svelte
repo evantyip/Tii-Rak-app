@@ -9,10 +9,11 @@
 	export let form: ActionData;
 
 	let loading: boolean;
-	let avatarLink: string = data.avatarLink;
+	let avatarLink: string;
 	let usernameChange: boolean = false;
 	let profilePictureChange: boolean = false;
 	let partnerChange: boolean = false;
+	$: avatarLink = data.avatarLink;
 	$: changesTouched = usernameChange || profilePictureChange;
 	$: loading = false;
 
