@@ -9,6 +9,8 @@
 	export let date: string;
 	export let winsOfTheDay: string[];
 	export let lastPost: boolean;
+
+	const formattedDate = new Date(date).toLocaleDateString();
 </script>
 
 <li>
@@ -49,7 +51,7 @@
 						</p>
 					</div>
 					<!-- Date/time -->
-					<p class="mt-0.5 text-sm text-gray-500">{date}</p>
+					<p class="mt-0.5 text-sm text-gray-500">{formattedDate}</p>
 				</div>
 				<div class="mt-2 text-sm text-gray-700">
 					<!-- Content goes here -->
