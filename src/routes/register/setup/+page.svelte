@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { applyAction, enhance } from '$app/forms';
+	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { pb } from '$lib/pocketbase';
 	import { Error } from '$lib/components';
@@ -11,17 +11,16 @@
 	$: loading = false;
 
 	function setupEnhance() {
-		return async ({ result }: { result: any }) => {
+		return async ({ result, update }: { result: any; update: any }) => {
 			loading = true;
 			switch (result.type) {
-				case 'success':
+				case 'failure':
+					await update({ reset: false });
+					break;
+				case 'redirect':
 					pb.authStore.loadFromCookie(document.cookie);
-					goto('/');
+					goto(result.location);
 					break;
-				case 'error':
-					break;
-				default:
-					await applyAction(result);
 			}
 			loading = false;
 		};

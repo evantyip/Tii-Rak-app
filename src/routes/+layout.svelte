@@ -220,10 +220,12 @@
 									</svg>
 								{/if}
 							</div>
-							<div class="ml-3">
-								<div class="text-base font-medium text-white">{$currentUser.first_name}</div>
-								<div class="text-sm font-medium text-indigo-300">{$currentUser.username}</div>
-							</div>
+							{#if $currentUser.first_name}
+								<div class="ml-3">
+									<div class="text-base font-medium text-white">{$currentUser.first_name}</div>
+									<div class="text-sm font-medium text-indigo-300">{$currentUser.username}</div>
+								</div>
+							{/if}
 						</div>
 					</div>
 					<div class="mt-3 space-y-1 px-2">
