@@ -21,7 +21,13 @@
 
 	async function googleOAuthSignIn() {
 		try {
-			await pb.collection('users').authWithOAuth2({ provider: 'google' });
+			let w = window.open() as Window;
+			await pb.collection('users').authWithOAuth2({
+				provider: 'google',
+				urlCallback: (url) => {
+					w.location.href = url;
+				}
+			});
 			goto('/');
 		} catch (err) {
 			console.error(err);
