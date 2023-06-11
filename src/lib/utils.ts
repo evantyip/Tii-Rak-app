@@ -8,3 +8,5 @@ export const getImageURL = (
 ): string => {
 	return `${PUBLIC_POCKETBASE_URL}/api/files/${collectionId}/${recordId}/${fileName}?thumb=${size}`;
 };
+
+export const TIMELINE_LOAD_AMOUNT = 7;

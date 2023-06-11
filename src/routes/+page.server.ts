@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageData, PageServerLoad } from './$types';
+import { TIMELINE_LOAD_AMOUNT } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user && !locals.user.first_name) {
@@ -7,7 +8,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	}
 
 	if (locals.user) {
-		const resultList = await locals.pb.collection('daily_wins').getList(1, 50, {
+		const resultList = await locals.pb.collection('daily_wins').getList(1, TIMELINE_LOAD_AMOUNT, {
 			fitler: `user = "${locals.user.id}" || user = "${locals.user.partner}"`,
 			sort: '-created',
 			expand: 'user'
