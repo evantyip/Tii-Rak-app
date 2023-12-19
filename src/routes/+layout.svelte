@@ -19,7 +19,7 @@
 	function pageName(path: string) {
 		switch (path) {
 			case '/':
-				return 'Home';
+				return '';
 			case '/wins':
 				return 'Slays for the day';
 			case '/profile':

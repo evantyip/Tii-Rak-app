@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Timeline } from '$lib/components';
+	import { Timeline, Landing } from '$lib/components';
 	import { currentUser } from '$lib/pocketbase';
 	import type { PageData } from './$types';
 
@@ -10,6 +10,6 @@
 	{#if $currentUser}
 		<Timeline {data} />
 	{:else}
-		<h1>Should be a landing info section</h1>
+		<Landing />
 	{/if}
 </div>
