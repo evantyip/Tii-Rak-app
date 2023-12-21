@@ -10,20 +10,24 @@
 	export let winsOfTheDay: string[];
 	export let lastPost: boolean;
 
-	const formattedDate = new Date(date).toLocaleDateString();
+	const formattedDate = new Date(date).toLocaleDateString('en-US', {
+		month: 'long',
+		day: 'numeric',
+		year: 'numeric'
+	});
 </script>
 
 <li>
 	<div class="relative pb-8">
 		<!-- This span is the line that connects to other below it -->
 		{#if !lastPost}
-			<span class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
+			<span class="absolute left-6 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
 		{/if}
 		<div class="relative flex items-start space-x-3">
 			<div class="relative">
 				{#if authorAvatar}
 					<img
-						class="flex h-10 w-10 object-cover items-center justify-center rounded-full bg-gray-400 ring-8 ring-white"
+						class="flex h-16 w-16 object-cover items-center justify-center rounded-full bg-gray-400 ring-8 ring-white"
 						src={getImageURL(authorCollectionId, authorId, authorAvatar, '500x500')}
 						alt="user avatar"
 					/>
@@ -55,7 +59,7 @@
 				</div>
 				<div class="mt-2 text-sm text-gray-700">
 					<!-- Content goes here -->
-					<div class="overflow-hidden lg:w-1/2 w-9/12 rounded-md border border-gray-300">
+					<div class="overflow-hidden rounded-md border border-gray-300">
 						<ul class="divide-y divide-gray-300">
 							{#each winsOfTheDay as win}
 								<li class="px-6 py-4 whitespace-pre-wrap">
