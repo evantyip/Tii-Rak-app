@@ -146,7 +146,7 @@
 									<dd class="mt-1 flex justify-between gap-x-6 sm:mt-0 sm:flex-auto">
 										{#if usernameChange}
 											<div
-												class="flex lg:w-1/3 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md"
+												class="flex lg:w-1/3 rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-eggplant sm:max-w-md"
 											>
 												<input
 													type="text"
@@ -161,7 +161,7 @@
 											<div class="text-gray-900">{$currentUser?.username}</div>
 											<button
 												type="button"
-												class="font-semibold text-indigo-600 hover:text-indigo-500"
+												class="font-semibold text-eggplant hover:text-carnation-pink"
 												on:click={() => (usernameChange = true)}
 											>
 												Update
@@ -184,7 +184,7 @@
 											<button
 												type="button"
 												on:click={() => (partnerChange = true)}
-												class="font-semibold text-indigo-600 hover:text-indigo-500">Remove</button
+												class="font-semibold text-eggplant hover:text-carnation-pink">Remove</button
 											>
 										{:else}
 											<div class="text-gray-900">---</div>
@@ -209,7 +209,7 @@
 					</button>
 					<button
 						type="submit"
-						class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+						class="rounded-md bg-eggplant px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-carnation-pink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eggplant"
 						disabled={loading}
 					>
 						Save

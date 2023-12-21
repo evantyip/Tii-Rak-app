@@ -33,7 +33,7 @@
 	}
 </script>
 
-<div class="flow-root py-6">
+<div class="flex justify-center items-center md:w-3/4 py-6">
 	<ul class="-mb-8">
 		{#each listData as day, index}
 			<Post
