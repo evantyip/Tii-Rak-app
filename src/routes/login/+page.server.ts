@@ -1,31 +1,40 @@
 import { redirect, type Actions, fail } from '@sveltejs/kit';
+import { z } from 'zod';
+import { message, superValidate } from 'sveltekit-superforms/server';
 import type { PageData, PageServerLoad } from './$types';
+
+const loginSchema = z.object({
+	email: z.string().email(),
+	password: z.string().min(1, 'Password cannot be empty')
+});
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) {
 		throw redirect(303, '/');
 	}
 
-	const emptyPageData: PageData = {};
+	const form = await superValidate(loginSchema);
+
+	const emptyPageData: PageData = {
+		form
+	};
+
 	return emptyPageData;
 };
 
 export const actions: Actions = {
 	default: async ({ locals, request, url }) => {
-		const data = Object.fromEntries(await request.formData()) as {
-			email: string;
-			password: string;
-		};
+		const form = await superValidate(request, loginSchema);
+		const { data } = form;
+
+		if (!form.valid) {
+			return fail(400, { form });
+		}
 
 		try {
 			await locals.pb.collection('users').authWithPassword(data.email, data.password);
 		} catch (err) {
-			console.error(err);
-
-			return fail(422, {
-				error: true,
-				errorMessages: ['Invalid login credentials']
-			});
+			return message(form, { type: 'error', text: 'Invalid login credentials' });
 		}
 
 		const redirectTo = url.searchParams.get('redirectTo');

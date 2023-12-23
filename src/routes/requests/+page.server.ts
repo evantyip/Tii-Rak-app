@@ -1,6 +1,12 @@
-import { redirect, type Actions } from '@sveltejs/kit';
+import { redirect, type Actions, fail } from '@sveltejs/kit';
+import { z } from 'zod';
+import { message, setError, superValidate } from 'sveltekit-superforms/server';
 import type { PageData, PageServerLoad } from './$types';
 import { ClientResponseError } from 'pocketbase';
+
+const schema = z.object({
+	username: z.string().min(1, { message: 'Search field cannot be empty' }).trim()
+});
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user) {
@@ -22,8 +28,11 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		expand: 'from_user'
 	});
 
+	const form = await superValidate(schema);
+
 	const pageData: PageData = {
-		requests: structuredClone(resultList)
+		requests: structuredClone(resultList),
+		form
 	};
 
 	return pageData;
@@ -31,14 +40,12 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 export const actions: Actions = {
 	partnerRequest: async ({ locals, request }) => {
-		const data = Object.fromEntries(await request.formData()) as {
-			username: string;
-		};
+		const form = await superValidate(request, schema);
 
-		const username = data.username.trim();
+		const username = form.data.username;
 
-		if (!username) {
-			return { error: true, errorMessages: ['Search field cannot be empty'] };
+		if (!form.valid) {
+			return fail(400, { form });
 		}
 
 		try {
@@ -47,7 +54,7 @@ export const actions: Actions = {
 				.getFirstListItem(`username="${username}"`);
 
 			if (requestedPartner.partner !== '') {
-				return { error: true, errorMessages: ['Cannot send partner request to user'] };
+				return setError(form, 'username', 'Cannot send partner request to user');
 			}
 
 			const existingPartnerRequest = await locals.pb.collection('partner_requests').getList(1, 1, {
@@ -55,7 +62,7 @@ export const actions: Actions = {
 			});
 
 			if (existingPartnerRequest.totalItems > 0) {
-				return { error: true, errorMessages: ['Already sent partner request to user'] };
+				return setError(form, 'username', 'Already sent partner request to user');
 			}
 
 			await locals.pb.collection('partner_requests').create({
@@ -63,13 +70,13 @@ export const actions: Actions = {
 				to_partner: requestedPartner.id as string
 			});
 		} catch (err: unknown) {
-			console.log(err);
 			if (err instanceof ClientResponseError && err.status == 404) {
-				return { error: true, errorMessages: ['Username not found'] };
+				return setError(form, 'username', 'Username not found');
 			}
-			return { error: true, errorMessages: ['Something went wrong'] };
+
+			return message(form, { type: 'error', text: 'Something went wrong, please try again.' });
 		}
 
-		return { success: true };
+		return message(form, { type: 'success', text: 'Successfully sent request' });
 	}
 };

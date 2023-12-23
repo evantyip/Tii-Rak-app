@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { superForm } from 'sveltekit-superforms/client';
 	import { goto } from '$app/navigation';
 	import { pb } from '$lib/pocketbase';
 	import { Error } from '$lib/components';
-	import type { ActionData } from './$types';
+	import type { PageData } from './$types';
 
-	export let form: ActionData;
+	export let data: PageData;
 
+	const { form, errors, message } = superForm(data.form, { multipleSubmits: 'prevent' });
 	let loading: boolean;
 	$: loading = false;
 
@@ -30,7 +32,7 @@
 <div class="flex min-h-full rounded-2xl flex-col justify-center py-12 sm:px-6 lg:px-8">
 	<div class="sm:mx-auto sm:w-full sm:max-w-md">
 		<h2 class="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-			Welcome to Thirak
+			Welcome to Tii Rak
 		</h2>
 		<h2 class="text-center text-base leading-9 tracking-tight text-gray-500">
 			Finish account setup
@@ -39,10 +41,20 @@
 
 	<div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
 		<div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
-			{#if form?.error && form?.errorMessages.length === 1}
-				<Error mainMessage={form?.errorMessages[0]} />
-			{:else if form?.error && form?.errorMessages.length > 1}
-				<Error mainMessage="Something went wrong" messages={form?.errorMessages} />
+			{#if $message?.type === 'error'}
+				<div class="pb-6">
+					<Error mainMessage={$message?.text} />
+				</div>
+			{/if}
+			{#if $errors?.first_name}
+				<div class="pb-6">
+					<Error mainMessage={String($errors?.first_name)} />
+				</div>
+			{/if}
+			{#if $errors?.username}
+				<div class="pb-6">
+					<Error mainMessage={String($errors?.username)} />
+				</div>
 			{/if}
 			<form class="space-y-6" method="POST" use:enhance={setupEnhance}>
 				<div>
@@ -53,8 +65,7 @@
 						<input
 							id="username"
 							name="username"
-							type="username"
-							required
+							bind:value={$form.username}
 							class="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-eggplant sm:text-sm sm:leading-6"
 							disabled={loading}
 						/>
@@ -70,7 +81,7 @@
 							id="first_name"
 							name="first_name"
 							type="text"
-							required
+							bind:value={$form.first_name}
 							class="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-eggplant sm:text-sm sm:leading-6"
 							disabled={loading}
 						/>

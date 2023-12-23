@@ -8,6 +8,12 @@ declare global {
 			pb: import('pocketbase').default;
 			user: import('pocketbase').default['authStore']['model'];
 		}
+		namespace Superforms {
+			type Message = {
+				type: 'error' | 'success';
+				text: string;
+			};
+		}
 		// interface PageData {}
 		// interface Platform {}
 	}

@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { Error } from '$lib/components';
+	import { superForm } from 'sveltekit-superforms/client';
 	import CancelModal from '$lib/components/CancelModal.svelte';
 	import { currentUser, pb } from '$lib/pocketbase';
-	import type { ActionData, PageData } from './$types';
+	import type { PageData } from './$types';
 
 	export let data: PageData;
-	export let form: ActionData;
+	const { form, errors, message } = superForm(data.form);
 
 	let loading: boolean;
 	let avatarLink: string;
@@ -78,10 +79,20 @@
 {/if}
 
 <div class="container bg-white rounded-2xl mx-auto py-3 sm:px-6 lg:px-8">
-	{#if form?.error && !form?.success && form?.errorMessages.length === 1}
-		<Error mainMessage={form?.errorMessages[0]} />
-	{:else if form?.error && !form?.success && form?.errorMessages.length > 1}
-		<Error mainMessage="Something went wrong" messages={form?.errorMessages} />
+	{#if $message?.type === 'error'}
+		<div class="pb-6">
+			<Error mainMessage={$message?.text} />
+		</div>
+	{/if}
+	{#if $errors?.username}
+		<div class="pb-6">
+			<Error mainMessage={String($errors?.username)} />
+		</div>
+	{/if}
+	{#if $errors?.avatar}
+		<div class="pb-6">
+			<Error mainMessage={String($errors?.avatar)} />
+		</div>
 	{/if}
 	<form
 		method="POST"
@@ -153,6 +164,7 @@
 													name="username"
 													id="username"
 													class="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+													bind:value={$form.username}
 													placeholder={$currentUser?.username}
 													disabled={loading}
 												/>

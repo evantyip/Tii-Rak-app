@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { pb } from '$lib/pocketbase';
 	import { writable } from 'svelte/store';
-	import type { ActionData } from './$types';
-	import { enhance } from '$app/forms';
+	import { superForm } from 'sveltekit-superforms/client';
+	import type { PageData } from './$types';
 	import { getImageURL } from '$lib/utils';
+	import Error from '$lib/components/Error.svelte';
 
 	interface PartnerRequest {
 		id: string;
@@ -25,13 +26,17 @@
 		items: PartnerRequest[];
 	}
 
-	interface PageData {
+	interface Data extends PageData {
 		requests: PartnerRequests;
+		form: any;
 	}
 
-	export let data: PageData;
-	export let form: ActionData;
+	export let data: Data;
 	let requests = writable<PartnerRequest[]>(data.requests.items);
+	let acceptOrDenyError = { type: 'success', text: '' };
+	const { form, errors, message, enhance } = superForm(data.form, {
+		multipleSubmits: 'prevent'
+	});
 
 	async function acceptRequest(index: number) {
 		const partnerRequest = $requests[index];
@@ -47,7 +52,10 @@
 
 			requests.update((requests) => requests.filter((_, i) => i !== index));
 		} catch (err) {
-			console.log(err);
+			acceptOrDenyError = {
+				type: 'error',
+				text: 'Accepting partner has failed, please try again.'
+			};
 		}
 	}
 
@@ -58,12 +66,18 @@
 			await pb.collection('partner_requests').delete(partnerRequest.id);
 			requests.update((requests) => requests.filter((_, i) => i !== index));
 		} catch (err) {
-			console.error(err);
+			acceptOrDenyError = {
+				type: 'error',
+				text: 'Deleting partner request has failed, please try again.'
+			};
 		}
 	}
 </script>
 
 <div class="container bg-white rounded-2xl mx-auto py-3 sm:px-6 lg:px-8">
+	{#if acceptOrDenyError.type === 'error'}
+		<Error mainMessage={acceptOrDenyError.text} />
+	{/if}
 	<div class="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
 		<h3 class="text-2xl font-semibold leading-6 text-gray-900">Incoming Partner Requests</h3>
 		<p class="mt-4 text-sm text-gray-500">You can only have one active partner at a time</p>
@@ -135,7 +149,7 @@
 	</div>
 
 	<div class="flex flex-col flex-shrink md:w-9/12 lg:w-1/2">
-		{#if form?.success}
+		{#if $message?.type === 'success'}
 			<div class="rounded-md bg-green-50 p-4">
 				<div class="flex">
 					<div class="flex-shrink-0">
@@ -160,37 +174,10 @@
 					</div>
 				</div>
 			</div>
-		{:else if form?.error}
-			<div class="rounded-md bg-red-50 p-4">
-				<div class="flex">
-					<div class="flex-shrink-0">
-						<svg
-							class="h-5 w-5 text-red-400"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-							aria-hidden="true"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-					</div>
-					<div class="ml-3">
-						<h3 class="text-sm font-medium text-red-800">
-							There were {form?.errorMessages.length} error(s)
-						</h3>
-						<div class="mt-2 text-sm text-red-700">
-							<ul class="list-disc space-y-1 pl-5">
-								{#each form?.errorMessages as message}
-									<li>{message}</li>
-								{/each}
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
+		{:else if $errors.username}
+			<Error mainMessage={String($errors.username)} />
+		{:else if $message?.type === 'error'}
+			<Error mainMessage={$message?.text} />
 		{/if}
 
 		<form method="POST" action="?/partnerRequest" use:enhance>
@@ -199,6 +186,7 @@
 					name="username"
 					type="text"
 					class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-eggplant sm:text-sm sm:leading-6"
+					bind:value={$form.username}
 				/>
 				<button
 					type="submit"
