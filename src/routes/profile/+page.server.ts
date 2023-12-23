@@ -1,6 +1,15 @@
 import { redirect, type Actions, fail } from '@sveltejs/kit';
+import { z } from 'zod';
+import { message, setError, superValidate } from 'sveltekit-superforms/server';
 import type { PageData, PageServerLoad } from './$types';
 import { ClientResponseError } from 'pocketbase';
+
+const profileSchema = z
+	.object({
+		avatar: z.instanceof(File),
+		username: z.string().min(4, 'Username must include at least 4 characters').optional()
+	})
+	.partial();
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!locals.user) {
@@ -21,65 +30,68 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		{ thumb: '500x500' }
 	);
 
+	const form = await superValidate(profileSchema);
+
+	const pageData: PageData = {
+		avatarLink,
+		form
+	};
+
 	if (locals.user.partner) {
 		const partnerRecord = await locals.pb.collection('users').getOne(locals.user.partner);
 		return {
-			partnerRecord: structuredClone(partnerRecord),
-			avatarLink
+			...pageData,
+			partnerRecord: structuredClone(partnerRecord)
 		};
 	}
-
-	const pageData: PageData = {
-		avatarLink
-	};
 
 	return pageData;
 };
 
 export const actions: Actions = {
 	profileUpdate: async ({ locals, request }) => {
-		const data = await request.formData();
-		const userAvatar = data.get('avatar') as File;
-		const username = data.get('username');
+		const formData = await request.formData();
+		const form = await superValidate(formData, profileSchema);
+		const userAvatar = formData.get('avatar') as File;
+		const username = formData.get('username');
+
+		if (!form.valid) {
+			return fail(400, { form });
+		}
 
 		if (userAvatar.size === 0) {
-			data.delete('avatar');
+			formData.delete('avatar');
 		}
 
 		if (username === '') {
-			data.delete('username');
+			formData.delete('username');
 		}
 
 		if (locals.user) {
 			try {
-				const result = await locals.pb.collection('users').update(locals.user?.id as string, data);
+				const result = await locals.pb
+					.collection('users')
+					.update(locals.user?.id as string, formData);
 
 				locals.user = structuredClone(result);
 			} catch (err: unknown) {
 				if (err instanceof ClientResponseError && err.data.data.avatar) {
-					return fail(422, {
-						error: true,
-						errorMessages: [err.data.data.avatar.message]
-					});
+					return setError(form, 'avatar', err.data.data.avatar.message);
 				}
 
 				if (err instanceof ClientResponseError && err.data.data.username) {
-					return fail(422, {
-						error: true,
-						errorMessages: [err.data.data.username.message]
-					});
+					return setError(form, 'username', err.data.data.username.message);
 				}
 
-				return fail(500, {
-					error: true,
-					errorMessages: ['Something went wrong']
-				});
+				return message(form, { type: 'error', text: 'Something went wrong' });
 			}
 
+			// return message(form, { type: 'success', text: 'Successfully updated profile' });
 			return { success: true };
 		}
 	},
-	removePartner: async ({ locals }) => {
+	removePartner: async ({ locals, request }) => {
+		const form = await superValidate(request, profileSchema);
 		try {
 			const partnerId = locals.user?.partner as string;
 			await locals.pb.collection('users').update(partnerId, { partner: null });
@@ -87,14 +99,9 @@ export const actions: Actions = {
 		} catch (err) {
 			console.log(err);
 
-			return fail(500, {
-				error: true,
-				errorMessages: ['Something went wrong']
-			});
+			return message(form, { type: 'error', text: 'Something went wrong' });
 		}
 
-		return {
-			success: true
-		};
+		return message(form, { type: 'success', text: 'Successfully updated profile' });
 	}
 };
