@@ -21,7 +21,7 @@
 	<div class="relative pb-8">
 		<!-- This span is the line that connects to other below it -->
 		{#if !lastPost}
-			<span class="absolute left-6 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
+			<span class="absolute left-6 top-5 -ml-px h-full w-0.5 bg-olivine" aria-hidden="true" />
 		{/if}
 		<div class="relative flex items-start space-x-3">
 			<div class="relative">
