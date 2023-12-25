@@ -21,19 +21,19 @@
 	<div class="relative pb-8">
 		<!-- This span is the line that connects to other below it -->
 		{#if !lastPost}
-			<span class="absolute left-6 top-5 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
+			<span class="absolute left-6 top-5 -ml-px h-full w-0.5 bg-olivine" aria-hidden="true" />
 		{/if}
 		<div class="relative flex items-start space-x-3">
 			<div class="relative">
 				{#if authorAvatar}
 					<img
-						class="flex h-16 w-16 object-cover items-center justify-center rounded-full bg-gray-400 ring-8 ring-white"
+						class="flex h-10 w-10 md:h-16 md:w-16 object-cover items-center justify-center rounded-full bg-gray-400 ring-4 ring-olivine"
 						src={getImageURL(authorCollectionId, authorId, authorAvatar, '500x500')}
 						alt="user avatar"
 					/>
 				{:else}
 					<svg
-						class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 ring-8 ring-white"
+						class="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 ring-4 ring-olivine"
 						viewBox="0 0 20 20"
 						fill="currentColor"
 						aria-hidden="true"

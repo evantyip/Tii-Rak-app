@@ -6,7 +6,7 @@
 	export let data: PageData;
 </script>
 
-<div class="flex justify-center bg-white rounded-2xl pb-12 mx-auto py-3 sm:px-6 lg:px-8">
+<div class="flex justify-center pb-12 mx-auto py-3 sm:px-6 lg:px-8">
 	{#if $currentUser}
 		<Timeline {data} />
 	{:else}
