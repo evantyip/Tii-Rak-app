@@ -1,31 +1,41 @@
-# create-svelte
+# Tii Rak
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+A relationship app for partners to keep in touch with each other during the busy days of today
 
-## Creating a project
+# Tech Stack
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+- Frontend [Svelte Kit](https://kit.svelte.dev/docs/introduction)
+- Backend [Pocketbase](https://github.com/pocketbase/pocketbase)
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+1. Download [pocketbase](https://github.com/pocketbase/pocketbase/releases) release
+
+2. Download repo and create local env file with the following keys
 
 ```bash
+PUBLIC_POCKETBASE_URL='http://127.0.0.1:8090'
+PUBLIC_ENVIRONMENT='development'
+```
+
+3. Start Svelte Kit development server
+
+```bash
+npm install
+
 npm run dev
 
 # or start the server and open the app in a new browser tab
 npm run dev -- --open
 ```
 
-## Building
+4. CD into folder containing pocketbase executable and start pocketbase server
+
+```bash
+cd {path to pocketbase} && ./pocketbase serve
+```
+
+## Building Svelte Kit
 
 To create a production version of your app:
 
@@ -36,3 +46,7 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+
+# Deployment
+
+Currently using fly.io to deploy pocketbase instance with storage for DB. Vercel is used for Svelte Kit deployment
